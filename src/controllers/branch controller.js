@@ -6,6 +6,7 @@ const createbranch = async(req,res) =>{
 
         if(!ifsc_code || !branch_name){
             res.status(400).json({message:'ifsc code and branch name is required'})
+            
         }
         const [result] = await pool.query(
             `insert into branch
@@ -57,9 +58,39 @@ const getbranchbyid = async(req,res) =>{
     }
 }
 
+const updatebranch = async(req,res) =>{
+    try{
+        const {branch_id} = req.params
+        const {branch_name,address} = req.body
+
+        const [rows] = await pool.query(
+            `update branch
+            set branch_name =? , address = ? where branch_id =?`,
+            [
+                branch_name,
+                address,
+                branch_id
+            ]
+        )
+        res.status(201).json({
+            message:'updated branch details successfully',
+            branch:{
+                branch_name,
+                address
+            }
+        })
+    }catch(err){
+        console.log(err)
+        res.status(500).send('Internal Server Error')
+    }
+}
+
+
+
 module.exports = {createbranch,
     getbranch,
-    getbranchbyid
+    getbranchbyid,
+    updatebranch
 }
 
 

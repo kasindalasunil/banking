@@ -18,8 +18,7 @@ const createuser = async(req,res) => {
                 email,
                 address || null,
                 kyc_status ||'pending',
-                is_verified ||false
-            ]
+                is_verified ||false-9            ]
         );
 
         res.status(201).json({
@@ -44,12 +43,12 @@ const getusers = async(req,res) =>{
 }
 const getuserbyid = async(req,res)=>{
     try{
-        const {id} = req.params
-        console.log('user id',id)
-        const [rows] = await pool.query('select * from `user`',[id])
+        const {user_id} = req.params
+        console.log('user id',user_id)
+        const [rows] = await pool.query('select * from `user`',[user_id])
 
         res.status(201).json({message:'got the userdetails by id',
-            user:rows[1]
+            user:rows[0]
         })
 
     }catch(err){
@@ -58,9 +57,37 @@ const getuserbyid = async(req,res)=>{
     }
 }
 
+const updateuser = async(req,res)=>{
+    try{
+        const {user_id} = req.params;
+        const {first_name,last_name,email} = req.body;
+
+        const [rows] = await pool.query(
+            `update user set first_name=? , last_name =? , email = ? where user_id =?`,
+            [
+                first_name,
+                last_name,
+                email,
+                user_id
+            ]
+        )
+
+        res.status(201).json({
+            message:'updated user data successfuly',
+            user:rows[1]
+
+        })
+
+    }catch(err){
+        console.log(err)
+        res.status(500).send('Internal Server Error')
+    }
+}
+
 module.exports = {
     createuser,
     getusers,
-    getuserbyid
+    getuserbyid,
+    updateuser
 }
 
